@@ -174,16 +174,25 @@ class _MyHomePageState extends State<MyHomePage> {
                             ))
                 ],
               ),
-              Row(
+              Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  _buildQrView(context),
+                  if (result != null)
+                    Text(
+                        'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}')
+                  else
+                    const Text('Scan a code'),
+                  Container(
+                    height: 200,
+                    width: 200,
+                    child: _buildQrView(context),
+                  )
                 ],
               ),
-              Column(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  Row(
+                  Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
                       ElevatedButton(onPressed: () async {
@@ -209,7 +218,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ))
                     ],
                   ),
-                  Row(
+                  Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
                       ElevatedButton(
@@ -235,10 +244,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildQrView(BuildContext context) {
-    var scanArea = (MediaQuery.of(context).size.width < 400 ||
-            MediaQuery.of(context).size.height < 400)
-        ? 150.0
-        : 300.0;
     return QRView(
       key: qrKey,
       onQRViewCreated: _onQRViewCreated,
@@ -247,7 +252,7 @@ class _MyHomePageState extends State<MyHomePage> {
           borderRadius: 10,
           borderLength: 30,
           borderWidth: 10,
-          cutOutSize: scanArea),
+          cutOutSize: 150),
     );
   }
 
@@ -256,9 +261,9 @@ class _MyHomePageState extends State<MyHomePage> {
       this.controller = controller;
     });
     controller.scannedDataStream.listen((scanData) {
+      FirebaseDatabase.instance.ref('Check_in').set(scanData.code.toString());
       setState(() {
         result = scanData;
-        FirebaseDatabase.instance.ref('Check_in').set(result.toString());
       });
     });
   }
