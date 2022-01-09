@@ -177,11 +177,6 @@ class _MyHomePageState extends State<MyHomePage> {
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  if (result != null)
-                    Text(
-                        'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}')
-                  else
-                    const Text('Scan a code'),
                   Container(
                     height: 200,
                     width: 200,
@@ -261,7 +256,11 @@ class _MyHomePageState extends State<MyHomePage> {
       this.controller = controller;
     });
     controller.scannedDataStream.listen((scanData) {
-      FirebaseDatabase.instance.ref('Check_in').set(scanData.code.toString());
+      if (scanData.code.toString() == "Check in") {
+        FirebaseDatabase.instance.ref('Check_in').set("open");
+      } else if (scanData.code.toString() == "Check out") {
+        FirebaseDatabase.instance.ref('Check_out').set("open");
+      }
       setState(() {
         result = scanData;
       });
